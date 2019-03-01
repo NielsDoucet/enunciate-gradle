@@ -1,42 +1,50 @@
 plugins {
-  id "com.gradle.plugin-publish" version "0.9.9"
-  id 'java-gradle-plugin'
+    id "com.gradle.plugin-publish" version "0.9.9"
+    id 'java-gradle-plugin'
+    id 'maven-publish'
 }
 
 apply plugin: "java"
 apply plugin: "eclipse"
 
 ext {
-	pluginId = 'com.webcohesion.enunciate'
+    pluginId = 'com.webcohesion.enunciate'
 }
 
 repositories {
-	mavenCentral()
+    maven {
+        url 'https://nexus.collibra.com/repository/collibra-gradle-plugins'
+        credentials {
+            username nexusUserName
+            password nexusPassword
+        }
+    }
+    mavenCentral()
 }
 
 dependencies {
-	compile gradleApi()
-	compile "com.webcohesion.enunciate:enunciate-top:2.11.1"
+    compile gradleApi()
+    compile "com.webcohesion.enunciate:enunciate-top:2.12.0-FORK-COLLIBRA"
 }
 
 sourceCompatibility = "1.8"
 targetCompatibility = "1.8"
 
-version = "2.11.1"
+version = "2.12.0-FORK-COLLIBRA"
 group = "com.webcohesion.enunciate"
 
 pluginBundle {
-	website = 'http://enunciate.webcohesion.com/'
-	vcsUrl = 'https://github.com/stoicflame/enunciate-gradle'
-	description = 'A gradle plugin for generating documentation with Enunciate'
-	tags = ['enunciate', 'documentation']
+    website = 'http://enunciate.webcohesion.com/'
+    vcsUrl = 'https://github.com/stoicflame/enunciate-gradle'
+    description = 'A gradle plugin for generating documentation with Enunciate'
+    tags = ['enunciate', 'documentation']
 
-	plugins {
-		enunciatePlugin {
-			id = pluginId
-			displayName = 'Gradle Enunciate plugin'
-		}
-	}
+    plugins {
+        enunciatePlugin {
+            id = pluginId
+            displayName = 'Gradle Enunciate plugin'
+        }
+    }
 }
 
 gradlePlugin {
@@ -44,6 +52,23 @@ gradlePlugin {
         simplePlugin {
             id = pluginId
             implementationClass = 'com.webcohesion.enunciate.gradle.EnunciatePlugin'
+        }
+    }
+}
+
+publishing {
+    repositories {
+        maven {
+            credentials {
+                username nexusUserName
+                password nexusPassword
+            }
+            url 'https://nexus.collibra.com/repository/collibra-gradle-plugins'
+        }
+    }
+    publications {
+        mavenJava(MavenPublication) {
+            from project.components.java
         }
     }
 }
